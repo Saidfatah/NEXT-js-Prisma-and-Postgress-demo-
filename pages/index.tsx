@@ -3,9 +3,12 @@ import { GetServerSideProps } from "next"
 import Layout from "../components/Layout"
 import Post, { PostProps } from "../components/Post"
 import prismaClient from "../lib/prisma"
-import PostForm from '../components/PostForm'
 export const getServerSideProps: GetServerSideProps = async () => {
-  const feed = await prismaClient.post.findMany();
+  const feed = await prismaClient.post.findMany({
+    where:{
+      published:true
+    }
+  });
   console.log(feed)
   return {
     props: {
@@ -23,7 +26,6 @@ const Blog: React.FC<Props> = (props) => {
     <Layout>
       <div className="page">
         <h1>Public Feed</h1>
-        <PostForm/>
         <main>
           {props.feed.map((post) => (
             <div key={post.id} className="post">

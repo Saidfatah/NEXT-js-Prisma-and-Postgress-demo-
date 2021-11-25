@@ -1,17 +1,21 @@
-import prismaClient from '../../lib/prisma'
-export default async function  handler(req, res) {
-    if (req.method === 'POST') {
-        // Process a POST request
-        console.log(req.body)
-        const savedPost =await prismaClient.post.create({
-            data:{
-                ...JSON.parse(req.body)
-            }
-        })
+import { getSession } from 'next-auth/client';
+import prisma from '../../lib/prisma';
 
-        res.send(savedPost)
-      } else {
-        // Handle any other HTTP method
-        res.send("we don't do that here ")
-      }
+// POST /api/post
+// Required fields in body: title
+// Optional fields in body: content
+export default async function handle(req, res) {
+  console.log('called')
+  const { title, content } = req.body;
+
+  const session = await getSession({ req });
+
+  const result = await prisma.post.create({
+    data: {
+      title: title,
+      content: content,
+      // author: { connect: { email: session?.user?.email || undefined } },
+    },
+  });
+  res.json(result);
 }
